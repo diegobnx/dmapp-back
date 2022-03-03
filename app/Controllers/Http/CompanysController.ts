@@ -139,22 +139,27 @@ export default class CompanysController {
 
   public async delete({ request, auth }: HttpContextContract) {
     const { id } = request.params();
-    const hasCompany = await Company.findBy("id", id);
 
-    if (auth.user && hasCompany) {
-      if (
-        Number(auth.user.is_admin) === 1 ||
-        hasCompany.id_user === auth.user.id
-      ) {
-        hasCompany.delete();
-        return { message: "Empresa removida com sucesso!" };
+    if (id) {
+      const hasCompany = await Company.findBy("id", id);
+
+      if (auth.user && hasCompany) {
+        if (
+          Number(auth.user.is_admin) === 1 ||
+          hasCompany.id_user === auth.user.id
+        ) {
+          hasCompany.delete();
+          return { message: "Empresa removida com sucesso!" };
+        } else {
+          return {
+            error: "Você precisa ser admin ou proprietário do anúncio para isso!",
+          };
+        }
       } else {
-        return {
-          error: "Você precisa ser admin ou proprietário do anúncio para isso!",
-        };
+        return { error: "Você precisa estar logado!" };
       }
     } else {
-      return { error: "Você precisa estar logado!" };
+      return { error: "Nenhuma empresa foi selecionada!" };
     }
   }
 }
