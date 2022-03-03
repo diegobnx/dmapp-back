@@ -28,7 +28,7 @@ export default class CompanysController {
           });
 
           return response.status(201).json({
-            message: `Empresa ${newCompany.name} criada com sucesso!`
+            message: `Empresa ${newCompany.name} criada com sucesso!`,
           });
         } else {
           return { error: "Usuário não encontrado!" };
@@ -96,12 +96,12 @@ export default class CompanysController {
 
   public async update({ request, auth }: HttpContextContract) {
     const { name, cnpj, logo, address, whatsapp, instagram } = request.only([
-       "name",
-       "cnpj",
-       "logo",
-       "address",
-       "whatsapp",
-       "instagram",
+      "name",
+      "cnpj",
+      "logo",
+      "address",
+      "whatsapp",
+      "instagram",
     ]);
     const { id } = request.params();
 
@@ -134,6 +134,27 @@ export default class CompanysController {
       }
     } else {
       return { error: "Alguns campos são obrigatórios!" };
+    }
+  }
+
+  public async delete({ request, auth }: HttpContextContract) {
+    const { id } = request.params();
+    const hasCompany = await Company.findBy("id", id);
+
+    if (auth.user && hasCompany) {
+      if (
+        Number(auth.user.is_admin) === 1 ||
+        hasCompany.id_user === auth.user.id
+      ) {
+        hasCompany.delete();
+        return { message: "Empresa removida com sucesso!" };
+      } else {
+        return {
+          error: "Você precisa ser admin ou proprietário do anúncio para isso!",
+        };
+      }
+    } else {
+      return { error: "Você precisa estar logado!" };
     }
   }
 }

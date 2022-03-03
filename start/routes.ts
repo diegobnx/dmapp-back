@@ -26,5 +26,6 @@ Route.group(() => {
     Route.get("/getallbyadmin", "CompanysController.getAllByAdmin").middleware("auth");
     Route.get("/getall", "CompanysController.getAll");
     Route.put("/update/:id", "CompanysController.update").middleware("auth");
+    Route.delete("/delete/:id", "CompanysController.delete").middleware("auth");
   }).prefix("/company/");
 }).prefix("/api");
